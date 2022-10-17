@@ -1,30 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Translations{
-  final int _value;
-  const Translations(this._value);
+class Translations {
+  late int _value;
+
+  void update(int newValue){
+    _value = newValue;
+  }
 
   String get title => 'You clicked $_value times';
 }
 
-class ProxyProvUpdate extends StatefulWidget {
-  const ProxyProvUpdate({Key? key}) : super(key: key);
+class ProxyCreUpd extends StatefulWidget {
+  const ProxyCreUpd({Key? key}) : super(key: key);
 
   @override
-  State<ProxyProvUpdate> createState() => _ProxyProvUpdateState();
+  State<ProxyCreUpd> createState() => _ProxyCreUpdState();
 }
 
-class _ProxyProvUpdateState extends State<ProxyProvUpdate> {
+class _ProxyCreUpdState extends State<ProxyCreUpd> {
   int counter = 0;
-  
-  void increment(){
+
+  void increment() {
     setState(() {
       counter++;
-      print('counter: $counter');
+      print('counter : $counter');
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,18 +35,19 @@ class _ProxyProvUpdateState extends State<ProxyProvUpdate> {
         title: Text('Why ProxyProvider'),
       ),
       body: Center(
-        child: Provider<Translations>(
-          create: (_) => Translations(counter),
-          child: ProxyProvider0<Translations>(
-            update: (_, __) => Translations(counter),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ShowTranslations(),
-                SizedBox(height: 20.0),
-                IncreaseButton(increment: increment),
-              ],
-            ),
+        child: ProxyProvider0<Translations>(
+          create: (_) => Translations(),
+          update: (_, Translations? translations){
+            translations!.update(counter);
+            return translations;
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ShowTranslations(),
+              SizedBox(height: 20.0),
+              IncreaseButton(increment: increment),
+            ],
           ),
         ),
       ),
@@ -56,7 +60,7 @@ class ShowTranslations extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = Provider.of<Translations>(context).title;
+    final title = context.watch<Translations>().title;
     return Text(
       title,
       style: TextStyle(fontSize: 28.0),
@@ -82,4 +86,3 @@ class IncreaseButton extends StatelessWidget {
     );
   }
 }
-
